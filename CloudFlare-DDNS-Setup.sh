@@ -134,11 +134,12 @@ EOF
 
 cat <<'EOF' >> /usr/bin/cfupdater-v4
 # DO NOT CHANGE LINES BELOW
-ip=$(curl -s https://ipv4.icanhazip.com/)
+ip=$(curl -s -6 https://ip.made.moe/)
+comment="Updated by Cloudflare-DDNS at "$(TZ='Asia/Taipei' date +"[%m/%d %H:%M:%S] UTC+8")
 # SCRIPT START
-echo -n `date +"[%m/%d %H:%M:%S] "` >> /var/log/cfupdater.log
+echo -n `TZ='Asia/Taipei' date +"[%m/%d %H:%M:%S] UTC+8 "` >> /var/log/cfupdater.log
 echo "[Cloudflare DDNS] Check Initiated" >> /var/log/cfupdater.log
-echo -n `date +"[%m/%d %H:%M:%S] "` >> /var/log/cfupdater.log
+echo -n `TZ='Asia/Taipei' date +"[%m/%d %H:%M:%S] UTC+8 "` >> /var/log/cfupdater.log
 # Seek for the record
 record=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$zone_identifier/dns_records?name=$record_name" -H "X-Auth-Email: $auth_email" -H "X-Auth-Key: $auth_key" -H "Content-Type: application/json")
 # Can't do anything without the record
@@ -156,7 +157,7 @@ fi
 # Set the record identifier from result
 record_identifier=$(echo "$record" | grep -Po '(?<="id":")[^"]*' | head -1)
 # The execution of update
-update=$(curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/$zone_identifier/dns_records/$record_identifier" -H "X-Auth-Email: $auth_email" -H "X-Auth-Key: $auth_key" -H "Content-Type: application/json" --data "{\"id\":\"$zone_identifier\",\"type\":\"A\",\"proxied\":false,\"name\":\"$record_name\",\"content\":\"$ip\"}")
+update=$(curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/$zone_identifier/dns_records/$record_identifier" -H "X-Auth-Email: $auth_email" -H "X-Auth-Key: $auth_key" -H "Content-Type: application/json" --data "{\"id\":\"$zone_identifier\",\"type\":\"A\",\"proxied\":false,\"name\":\"$record_name\",\"comment\":\"$comment\",\"content\":\"$ip\"}")
 # The moment of truth
 case "$update" in
 *"\"success\":false"*)
