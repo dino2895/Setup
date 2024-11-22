@@ -134,7 +134,7 @@ EOF
 
 cat <<'EOF' >> /usr/bin/cfupdater-v4
 # DO NOT CHANGE LINES BELOW
-ip=$(curl -s https://ip.made.moe/)
+ip=$(curl -s -4 https://ip.made.moe/)
 comment="Updated by Cloudflare-DDNS at "$(TZ='Asia/Taipei' date +"[%m/%d %H:%M:%S] UTC+8")
 # SCRIPT START
 echo -n `TZ='Asia/Taipei' date +"[%m/%d %H:%M:%S] UTC+8 "` >> /var/log/cfupdater-v4.log
