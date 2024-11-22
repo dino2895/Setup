@@ -121,7 +121,7 @@ EOF
 
 function generate_cfupdater_script {
 printf "[${GREEN}${bold}配置${NC}${normal}] 開始生成 CloudFlare DDNS 腳本\n"
-touch /var/log/cfupdater.log
+touch /var/log/cfupdater-v4.log
 cat <<EOF > /usr/bin/cfupdater-v4
 #!/bin/bash
 # Forked by benkulbertis/cloudflare-update-record.sh
@@ -134,12 +134,12 @@ EOF
 
 cat <<'EOF' >> /usr/bin/cfupdater-v4
 # DO NOT CHANGE LINES BELOW
-ip=$(curl -s -6 https://ip.made.moe/)
+ip=$(curl -s https://ip.made.moe/)
 comment="Updated by Cloudflare-DDNS at "$(TZ='Asia/Taipei' date +"[%m/%d %H:%M:%S] UTC+8")
 # SCRIPT START
-echo -n `TZ='Asia/Taipei' date +"[%m/%d %H:%M:%S] UTC+8 "` >> /var/log/cfupdater.log
-echo "[Cloudflare DDNS] Check Initiated" >> /var/log/cfupdater.log
-echo -n `TZ='Asia/Taipei' date +"[%m/%d %H:%M:%S] UTC+8 "` >> /var/log/cfupdater.log
+echo -n `TZ='Asia/Taipei' date +"[%m/%d %H:%M:%S] UTC+8 "` >> /var/log/cfupdater-4.log
+echo "[Cloudflare DDNS] Check Initiated" >> /var/log/cfupdater-4.log
+echo -n `TZ='Asia/Taipei' date +"[%m/%d %H:%M:%S] UTC+8 "` >> /var/log/cfupdater-4.log
 # Seek for the record
 record=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$zone_identifier/dns_records?name=$record_name" -H "X-Auth-Email: $auth_email" -H "X-Auth-Key: $auth_key" -H "Content-Type: application/json")
 # Can't do anything without the record
@@ -151,7 +151,7 @@ fi
 old_ip=$(echo "$record" | grep -Po '(?<="content":")[^"]*' | head -1)
 # Compare if they're the same
 if [ $ip == $old_ip ]; then
-  echo "[Cloudflare DDNS] IP has not changed." >> /var/log/cfupdater.log
+  echo "[Cloudflare DDNS] IP has not changed." >> /var/log/cfupdater-4.log
   exit 0
 fi
 # Set the record identifier from result
@@ -161,10 +161,10 @@ update=$(curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/$zone_identi
 # The moment of truth
 case "$update" in
 *"\"success\":false"*)
-  >&2 echo -e "[Cloudflare DDNS] Update failed for $record_identifier. DUMPING RESULTS:\n$update" >> /var/log/cfupdater.log
+  >&2 echo -e "[Cloudflare DDNS] Update failed for $record_identifier. DUMPING RESULTS:\n$update" >> /var/log/cfupdater-4.log
   exit 1;;
 *)
-  echo "[Cloudflare DDNS] IPv4 context '$ip' has been synced to Cloudflare." >> /var/log/cfupdater.log;;
+  echo "[Cloudflare DDNS] IPv4 context '$ip' has been synced to Cloudflare." >> /var/log/cfupdater-4.log;;
 esac
 EOF
 
@@ -214,7 +214,7 @@ Requires=systemd-timesyncd-wait.service
 EOF
 systemctl enable cfupdate.timer &> /dev/null
 printf "[${GREEN}${bold}完成${NC}${normal}] Systemd 配置完成\n"
-printf "[${GREEN}${bold}提示${NC}${normal}] 設置完成，計時器執行紀錄紀錄於 /var/log/cfupdater.log\n"
+printf "[${GREEN}${bold}提示${NC}${normal}] 設置完成，計時器執行紀錄紀錄於 /var/log/cfupdater-4.log\n"
 }
 function start_systemd_timer {
 printf "[${GREEN}${bold}啟動${NC}${normal}] 正在啟動 Systemd 計時器\n"
