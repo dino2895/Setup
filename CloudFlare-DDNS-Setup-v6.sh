@@ -173,7 +173,7 @@ printf "[${GREEN}${bold}完成${NC}${normal}] CloudFlare DDNS 腳本生成完成
 }
 function setup_systemd {
 printf "[${GREEN}${bold}配置${NC}${normal}] 開始配置 Systemd\n"
-cat <<'EOF' > /etc/systemd/system/cfupdate.service
+cat <<'EOF' > /etc/systemd/system/cfupdate-v6.service
 [Unit]
 Description=Cloudflare DDNS service
 After=network.target
@@ -184,18 +184,18 @@ ExecStart=/usr/bin/cfupdater-v6
 WantedBy=multi-user.target
 EOF
 
-chmod 644 /etc/systemd/system/cfupdate.service
+chmod 644 /etc/systemd/system/cfupdate-v6.service
 
-cat <<EOF > /etc/systemd/system/cfupdate.timer
+cat <<EOF > /etc/systemd/system/cfupdate-v6.timer
 [Unit]
-Description=Run cfupdate.service when the timer ticks
+Description=Run cfupdate-v6.service when the timer ticks
 [Timer]
 OnCalendar=*:${seconds}
 AccuracySec=1ms
 [Install]
 WantedBy=timers.target
 EOF
-chmod 644 /etc/systemd/system/cfupdate.timer
+chmod 644 /etc/systemd/system/cfupdate-v6.timer
 
 mkdir ~/systemd-timesyncd-wait/
 cd ~/systemd-timesyncd-wait/
@@ -212,15 +212,15 @@ cd ~/
 cat <<'EOF' >> /lib/systemd/system/timers.target
 Requires=systemd-timesyncd-wait.service
 EOF
-systemctl enable cfupdate.timer &> /dev/null
+systemctl enable cfupdate-v6.timer &> /dev/null
 printf "[${GREEN}${bold}完成${NC}${normal}] Systemd 配置完成\n"
 printf "[${GREEN}${bold}提示${NC}${normal}] 設置完成，計時器執行紀錄紀錄於 /var/log/cfupdater-v6.log\n"
 }
 function start_systemd_timer {
 printf "[${GREEN}${bold}啟動${NC}${normal}] 正在啟動 Systemd 計時器\n"
 #systemctl daemon-reload
-systemctl start cfupdate.timer
-#systemctl status cfupdate.timer
+systemctl start cfupdate-v6.timer
+#systemctl status cfupdate-v6.timer
 printf "[${GREEN}${bold}啟動${NC}${normal}] 已啟動 Systemd 計時器\n"
 }
 
