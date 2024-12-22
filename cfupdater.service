@@ -1,0 +1,12 @@
+#/etc/systemd/system/cfupdater.service
+[Unit]
+Description=Cloudflare DDNS Updater
+After=network.target
+
+[Service]
+ExecStart=/path/to/cfupdater.sh
+EnvironmentFile=/path/to/.env
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

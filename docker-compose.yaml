@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  cloudflare-ddns:
+    image: cloudflare-ddns:latest
+    build:
+      context: .
+    container_name: cloudflare-ddns
+    restart: always
+    environment:
+      - AUTH_EMAIL=${AUTH_EMAIL}
+      - AUTH_KEY=${AUTH_KEY}
+      - ZONE_IDENTIFIER=${ZONE_IDENTIFIER}
+      - DOMAIN_SUFFIX=${DOMAIN_SUFFIX}
+      - UPDATE_INTERVAL=${UPDATE_INTERVAL}
+      - ENABLE_IPV4=${ENABLE_IPV4}
+      - ENABLE_IPV6=${ENABLE_IPV6}
